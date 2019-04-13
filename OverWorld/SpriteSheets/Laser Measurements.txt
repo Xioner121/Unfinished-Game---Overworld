@@ -1,0 +1,3 @@
+width: 100
+Height: 150
+Frames: 23

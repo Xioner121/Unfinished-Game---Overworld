@@ -1,0 +1,3 @@
+Width: 200px
+Height per Frame: 247px
+total Height: 1729px
