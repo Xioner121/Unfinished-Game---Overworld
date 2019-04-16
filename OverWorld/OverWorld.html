@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>OverWorld</title>
+</head>
+  <center>
+<canvas id="MainCanvas" width="1000" height="700"></canvas>
+</center>
+<body background = "Sprites\Site.png">
+<style type="text/css">
+canvas{border:#000000 10px solid;}
+p{
+  color: rgb(0,255,0)
+}
+</style>
+<p><small>'Zone 1 Music Credit: OurMusicBox (Jay Man)
+Track Name: "Your Journey Begins"
+Music By: Jay Man @ https://ourmusicbox.com/
+Official "OurMusicBox" YouTube Channel: http://www.youtube.com/c/ourmusicbox
+License for commercial use: Creative Commons Attribution 4.0 International (CC BY 4.0) https://creativecommons.org/licenses/...
+Music promoted by NCM https://goo.gl/fh3rEJ'</small>
+</p>
+<a target="_blank" href="https://www.hooksounds.com">Music by HookSounds</a>
+<iframe src="Audio/Silence.wav" allow="autoplay" id="audio" style="display:none"></iframe>
+<audio id="TitleSong" src="Audio\OpeningSong.mp3" loop></audio>
+<audio id="TransitionSong" src="Audio\WindEffect.mp3" loop></audio>
+<audio id="NatureSound" src="Audio\ForestLoop.mp3" loop></audio>
+<audio id="Area0" src="Audio\ZoneStart.wav" loop></audio>
+<script>
+
+//Sprite Image Variables-----------------------------------------------------------------------
+var PlayerStatic = new Image();
+PlayerStatic.src = "Sprites/PlayerStatic.png"
+var IntroBackground = new Image();
+IntroBackground.src = "Sprites/OpeningBackGround.png"
+var Title = new Image();
+Title.src = "Sprites/OverWorldTitle.png"
+var TitleButtonOff = new Image();
+TitleButtonOff.src = "Sprites/ButtonOff.png"
+var Fade = new Image();
+Fade.src = "Sprites/Fade.png"
+var WhiteFade = new Image();
+WhiteFade.src = "Text/Opening/WhiteFade.png"
+//SpriteSheet Image Variables-----------------------------------------------------------------
+var TitleButtonOn = new Image();
+TitleButtonOn.src = "SpriteSheets/ButtonOn.png"
+var TitleButtonOn2 = new Image();
+TitleButtonOn2.src = "SpriteSheets/ButtonOn2.png"
+var IntroLaser = new Image();
+IntroLaser.src = "SpriteSheets/LaserIntro.png"
+var PlayerAnimated = new Image();
+PlayerAnimated.src = "SpriteSheets/Player/PlayerIdle.png"
+//Tile Sprites--------------------------------------------------------------------------------
+var WorldTileFade = new Image();
+WorldTileFade.src = "MapTileSprites/WorldTileFade.png"
+var WorldTile0 = new Image();
+WorldTile0.src = "MapTileSprites/WorldTile0.png"
+// Text Variables-----------------------------------------------------------------------------
+var TextOpen1 = new Image();
+TextOpen1.src = "Text/Opening/1.png"
+var TextOpen2 = new Image();
+TextOpen2.src = "Text/Opening/2.png"
+var TextOpen3 = new Image();
+TextOpen3.src = "Text/Opening/3.png"
+var TextOpen4 = new Image();
+TextOpen4.src = "Text/Opening/4.png"
+var TextOpen5 = new Image();
+TextOpen5.src = "Text/Opening/5.png"
+var TextOpen6 = new Image();
+TextOpen6.src = "Text/Opening/6.png"
+var TextOpen7 = new Image();
+TextOpen7.src = "Text/Opening/7.png"
+var OpeningSkipButton = new Image();
+OpeningSkipButton.src = "Text/Opening/Skip.png"
+// Audio Variables---------------------------------------------------------------------------
+var IntroDoor = new Audio("Audio/DoorTitleSound.wav");
+var DoorAudInt = 0;
+var IntroDoor2 = new Audio("Audio/DoorTitleSound2.wav");
+var DoorAudInt2 = 0;
+var IntroSong = document.getElementById('TitleSong')
+var TransitionSong = document.getElementById('TransitionSong')
+var NatureSounds = document.getElementById('NatureSound')
+var Area0Song = document.getElementById('Area0')
+var LaserSoundEffect = new Audio("Audio/LaserSound.mp3");
+var CurrentSong = IntroSong;
+//Canvas Variables---------------------------------------------------------------------------
+var canvas;
+var canvasContext;
+var FrameRate = 60;
+//Mouse pos calculation function-------------------------------------------------------------
+var MouseX;
+var MouseY;
+function CalculateMousePos(evt) {
+  var rect = canvas.getBoundingClientRect();
+  var root = document.documentElement;
+  var mouseX = evt.clientX - rect.left - root.scrollLeft;
+  var mouseY = evt.clientY - rect.top - root.scrollTop;
+  return {
+x:mouseX,
+y:mouseY
+  }
+};
+//Animation Variables
+var ButtonAnimationIndex = 0; // Title Button
+var ButtonAnimationIndex2 = 0; // Title Button second phase
+var requestAnimationFrame = window.requestAnimationFrame || // multi-browser combatability
+window.mozRequestAnimationFrame ||
+window.webkitRequestAnimationFrame ||
+window.msRequestAnimationFrame;
+// checkign if a mouse is over a button Function
+function MouseCheck(ButX, SrcW, ButY, SrcH) {
+  var mousecheck = false;
+if (((MouseX <= ButX + SrcW) && (MouseX >= ButX)) && ((MouseY >= ButY) && (MouseY <= ButY + SrcH))) {
+  mousecheck = true;
+} return mousecheck;
+}
+// General starting function
+window.onload = function () {
+  canvas = document.getElementById("MainCanvas");
+  canvasContext = canvas.getContext("2d");
+  var MouseOverButton = false;
+  var ButtonX = ((canvas.width/2)-100);
+  var ButtonY = ((canvas.height/2)-100);
+  var SourceWidth = 200;
+  var ButtonHeight = 200;
+//Setting MouseX and MouseY when mouse moves
+  canvas.addEventListener('mousemove',
+  function(evt){ var mousePos = CalculateMousePos(evt);
+   MouseX = mousePos.x; MouseY = mousePos.y;
+  });
+  // Drawing opening Image
+    canvasContext.drawImage(IntroBackground,0,0,canvas.width, canvas.height);
+    canvasContext.drawImage(TitleButtonOff,ButtonX,ButtonY,SourceWidth,ButtonHeight);
+    // Title animation
+var TitleY = ((canvas.height/2)-400);
+var TitleCount = 0.5;
+var TitleAnime = setInterval(function(){
+  canvasContext.drawImage(Title,((canvas.width/2)-450),TitleY,900, 350);
+  TitleY += TitleCount;
+  if ((TitleY > (((canvas.height/2)-400)+10)) || (TitleY < (((canvas.height/2)-400)-10))) {TitleCount = TitleCount * -1;}
+}, 40);
+//Door Open and closeing
+var ButtonInt = setInterval(function(){if (MouseCheck(ButtonX, SourceWidth, ButtonY, ButtonHeight) === true)
+{MouseOverButton = true;
+  DoorAudInt2 = 0;
+//Sprite animation
+canvasContext.drawImage(TitleButtonOn,(ButtonAnimationIndex * SourceWidth),0,200,247,ButtonX,ButtonY,200, 200);
+// Audio checking
+if (DoorAudInt === 0) {DoorAudInt++;IntroDoor.play();}
+if (ButtonAnimationIndex < 7){ButtonAnimationIndex ++;}
+if (ButtonAnimationIndex === 7){canvasContext.drawImage(TitleButtonOn2,(ButtonAnimationIndex2 * SourceWidth),0,200,247,ButtonX,ButtonY,200, 200);
+ButtonAnimationIndex2 ++; if (ButtonAnimationIndex2 >= 20) {ButtonAnimationIndex2 = 0;}}
+}
+else {MouseOverButton = false;DoorAudInt = 0; ButtonAnimationIndex2 = 0;canvasContext.drawImage(TitleButtonOn,(ButtonAnimationIndex * SourceWidth),0,200,247,ButtonX,ButtonY,200, 200);
+if (ButtonAnimationIndex > 0){ButtonAnimationIndex --;}
+if (DoorAudInt2 === 0) {DoorAudInt2++;IntroDoor2.play();}
+}
+}, 70);
+// checking for button click
+canvas.addEventListener('click',
+function ButtonClick(){ if (MouseOverButton == true) {
+  clearInterval(ButtonInt);
+  clearInterval(TitleAnime);
+  canvas.removeEventListener('click', ButtonClick);
+  //Sound Fade out
+  for (i = 0; i < 40; i ++) { setTimeout( function(){
+    canvasContext.drawImage(Fade,0,0,canvas.width, canvas.height);
+    CurrentSong.volume -= 0.09
+  }, 10 + (100 * i))}
+  // Beggining game Transition
+  setTimeout(function(){
+CurrentSong.pause();
+CurrentSong = TransitionSong;
+CurrentSong.play();
+//Skip Button creation
+var SkipButtonCheck = false;
+//Checking if mouse clicked
+canvas.addEventListener('click',
+function ButtonSkipClick(){ if (MouseCheckSkip() === true) {
+  SkipButtonCheck = true;
+  canvas.removeEventListener('click', ButtonSkipClick);
+}})
+//End result after clicked
+var SkipButtonResultInt = setInterval(function(){
+  if (SkipButtonCheck == true) {
+clearInterval(SkipButtonResultInt);
+clearInterval(SkipButtonMouseCheck);
+IntroEnd();
+  }
+}, 10)
+// Checkign Mouse check for skip Button
+function MouseCheckSkip() { if (MouseCheck(50, 100, 600, 100) == false)
+{return false} else {return true}
+}
+// Checking if mouse over button
+var SkipButtonMouseCheck = setInterval(function(){if (MouseCheckSkip() === true)
+  {
+OpeningSkipButton.src = "Text/Opening/Skip2.png"
+} else {
+OpeningSkipButton.src = "Text/Opening/Skip.png"
+}}, 50)
+  // First Transition
+for (i = 0; i < 40; i ++) { setTimeout( function(){
+    if (SkipButtonCheck == false) {
+canvasContext.drawImage(TextOpen1,0,0,canvas.width, canvas.height);
+canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+}
+},(100 * i))}
+ // Second Transition
+ for (i = 0; i < 40; i ++) { setTimeout( function(){
+     if (SkipButtonCheck == false) {
+canvasContext.drawImage(TextOpen2,0,200,canvas.width, canvas.height);
+ canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+ }
+}, 4000 + (100 * i))}
+// Fade
+for (i = 0; i < 40; i ++) { setTimeout( function(){
+    if (SkipButtonCheck == false) {
+  canvasContext.drawImage(Fade,0,0,canvas.width, canvas.height);
+  canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+}
+}, 8000 + (100 * i))}
+// Third Transition Text
+for (i = 0; i < 40; i ++) { setTimeout( function(){
+    if (SkipButtonCheck == false) {
+  canvasContext.drawImage(TextOpen3,0,0,canvas.width, canvas.height);
+  canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+}
+},12000 + (100 * i))}
+// Fourth Tranisition Text
+for (i = 0; i < 40; i ++) { setTimeout( function(){
+    if (SkipButtonCheck == false) {
+  canvasContext.drawImage(TextOpen4,0,200,canvas.width, canvas.height);
+  canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+}
+},17000 + (100 * i))}
+// fade
+for (i = 0; i < 40; i ++) { setTimeout( function(){
+    if (SkipButtonCheck == false) {
+  canvasContext.drawImage(Fade,0,0,canvas.width, canvas.height);
+  canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+}
+}, 22000 + (100 * i))}
+// Fifth Transition Text
+for (i = 0; i < 20; i ++) { setTimeout( function(){
+    if (SkipButtonCheck == false) {
+  canvasContext.drawImage(TextOpen5,0,0,canvas.width, canvas.height);
+  canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+}
+},26000 + (100 * i))}
+// Sixth Transition Text
+for (i = 0; i < 40; i ++) { setTimeout( function(){
+    if (SkipButtonCheck == false) {
+  canvasContext.drawImage(TextOpen6,0,200,canvas.width, canvas.height);
+  canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+}
+},28000 + (100 * i))}
+// fade
+for (i = 0; i < 40; i ++) { setTimeout( function(){
+    if (SkipButtonCheck == false) {
+  canvasContext.drawImage(Fade,0,0,canvas.width, canvas.height);
+  canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+}
+}, 32000 + (100 * i))}
+// Seventh Transition Text
+for (i = 0; i < 40; i ++) { setTimeout( function(){
+    if (SkipButtonCheck == false) {
+  canvasContext.drawImage(TextOpen7,0,200,canvas.width, canvas.height);
+  canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+}
+},36000 + (100 * i))}
+// End opening
+setTimeout(function(){
+if (SkipButtonCheck == false) {
+  SkipButtonCheck = true;
+}}
+,40000)
+// End
+  }, 3200);
+}})
+  //Playing IntroSong
+  CurrentSong.play();
+}
+//IntroEnding
+function IntroEnd(){
+  var OpeningFade = 0;
+  for (i = 0; i < 200; i ++) { setTimeout( function(){
+    if (OpeningFade < 100) {OpeningFade += 10;}
+    if (OpeningFade > 99) {OpeningFade += 30;}
+    canvasContext.drawImage(WhiteFade,((canvas.width/2)-(OpeningFade/2)),((canvas.height/2)-(OpeningFade/2)),OpeningFade, OpeningFade);
+}, (10 * i))}
+  //End of transitions
+  setTimeout( function(){
+    for (i = 0; i < 100; i ++) { setTimeout( function(){
+      CurrentSong.volume -= 0.01
+    },(10 * i))}
+    setTimeout( function(){
+      CurrentSong.pause();
+      NatureSounds.play();
+      NatureSounds.volume = 0.2
+    },1000)
+  }, 2000)
+  // Drawing Opening Background of Game
+  for (i = 0; i < 40; i ++) { setTimeout( function(){
+    canvasContext.drawImage(WorldTileFade,0,0,canvas.width, canvas.height);
+  },3500 + (100 * i))}
+  setTimeout( function(){
+    ButtonAnimationIndex = 1;
+    SourceWidth = 100;
+    ButtonX = ((canvas.width/2)-50);
+    ButtonY = 0;
+  canvasContext.drawImage(WorldTile0,0,0,canvas.width, canvas.height);
+},7550);
+  // Laser Intro Animation
+  setTimeout( function(){
+  LaserSoundEffect.play();
+},7550)
+  for (i = 0; i < 40; i ++) { setTimeout( function(){
+    canvasContext.drawImage(WorldTile0,0,0,canvas.width, canvas.height);
+    if (ButtonAnimationIndex > 19) {
+      canvasContext.drawImage(PlayerStatic,((canvas.width/2)-(25/2)),((canvas.height/2)-(25)), 25, 50);
+    }
+    canvasContext.drawImage(IntroLaser,(ButtonAnimationIndex * SourceWidth),0,100,150,ButtonX,ButtonY,100,400);
+    ButtonAnimationIndex ++;
+  },7700 + (75 * i))}
+  //playing area 0 Music
+  setTimeout( function(){
+  CurrentSong = Area0Song;
+  CurrentSong.play();
+  Worldx = 0;
+  Worldy = 0;
+  // Drawing everything loop
+  requestAnimationFrame(DrawEverything);
+  // Setting movement  interval
+  MoveKeyLoop();
+},10400)
+};
+// Game loop Function
+// Game loop Variables
+// Movement variables
+var Worldx = 0;
+var Worldy = 0;
+var UpOrDown = 0;
+var PlayerAnimationInt = 0;
+var PlayerDirection = 0;
+// Movement listeners------------------------------------
+var keyState = {};
+window.addEventListener('keydown',function(e){
+    keyState[e.keyCode || e.which] = true;
+},true);
+window.addEventListener('keyup',function(e){
+    keyState[e.keyCode || e.which] = false;
+},true);
+
+function MoveKeyLoop() {
+  // X-pos changes ----------
+    if (keyState[65]){// Left (A)
+        Worldx += UpOrDown;
+        PlayerDirection = 'A'
+    }
+    if (keyState[68]){// Right (D)
+        Worldx -= UpOrDown
+        PlayerDirection = 'D'
+    }
+ // Y-pos changes ----------
+   if (keyState[83]){// Down (S)
+     UpOrDown = 1
+     Worldy -= 2;
+     PlayerDirection = 'S'
+   }
+   if (keyState[87]){// Up (W)
+     UpOrDown = 1
+     Worldy += 2;
+     PlayerDirection = 'W'
+   }
+//Checking for W or S key pressed, to Halve movement when moving diagonally, and checking for no movement
+   if (keyState[87] != true && keyState[83] != true) {
+     UpOrDown = 2;
+   } else if (keyState[87] != true && keyState[83] != true && keyState[68] != true && keyState[65] != true) {
+     PlayerDirection = 0
+   }
+  setTimeout(MoveKeyLoop, 10);
+}
+//-----------------------------------------------------
+//Character animation
+var PlayerX = 500 - (25/2)
+var PlayerY = 325
+var AnimationCountPlayer = 1
+function PlayerAnimate() {
+  if (PlayerAnimationInt > 10 || PlayerAnimationInt < 0) {
+AnimationCountPlayer = AnimationCountPlayer * -1
+}
+  PlayerAnimationInt += AnimationCountPlayer;
+canvasContext.drawImage(PlayerAnimated,(PlayerAnimationInt * 25),0,25,50,PlayerX,PlayerY,25,50)
+}
+//Sprite Drawing
+function DrawEverything () {
+    requestAnimationFrame(DrawEverythingBackground);
+    requestAnimationFrame(PlayerAnimate);
+    requestAnimationFrame(DrawEverything);
+}
+// Background Drawing
+function DrawEverythingBackground () {
+      canvasContext.drawImage(WorldTile0,Worldx,Worldy,canvas.width, canvas.height);
+}
+</script>
