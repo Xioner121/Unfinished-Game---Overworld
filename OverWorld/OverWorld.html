@@ -23,15 +23,20 @@ Music promoted by NCM https://goo.gl/fh3rEJ'</small>
 </p>
 <a target="_blank" href="https://www.hooksounds.com">Music by HookSounds</a>
 <iframe src="Audio/Silence.wav" allow="autoplay" id="audio" style="display:none"></iframe>
-<audio id="TitleSong" src="Audio\OpeningSong.mp3" loop></audio>
-<audio id="TransitionSong" src="Audio\WindEffect.mp3" loop></audio>
-<audio id="NatureSound" src="Audio\ForestLoop.mp3" loop></audio>
-<audio id="Area0" src="Audio\ZoneStart.wav" loop></audio>
+<audio id="TitleSong" src="Audio\OpeningSong.mp3" allow="autoplay" loop></audio>
+<audio id="TransitionSong" src="Audio\WindEffect.mp3" allow="autoplay" loop></audio>
+<audio id="NatureSound" src="Audio\ForestLoop.mp3" allow="autoplay" loop></audio>
+<audio id="Area0" src="Audio\ZoneStart.mp3" allow="autoplay" loop></audio>
+<audio id="deathsong" src="Audio\DeathSong.mp3" allow="autoplay"></audio>
 <script>
 
 //Sprite Image Variables-----------------------------------------------------------------------
 var PlayerStatic = new Image();
 PlayerStatic.src = "Sprites/PlayerStatic.png"
+var PlayerDead = new Image();
+PlayerDead.src = "Sprites/PlayerDead.png"
+var deathScreenButton = new Image();
+deathScreenButton.src = "Sprites/DeathButton.png"
 var IntroBackground = new Image();
 IntroBackground.src = "Sprites/OpeningBackGround.png"
 var Title = new Image();
@@ -42,6 +47,14 @@ var Fade = new Image();
 Fade.src = "Sprites/Fade.png"
 var WhiteFade = new Image();
 WhiteFade.src = "Text/Opening/WhiteFade.png"
+var HealthBarOutline = new Image();
+HealthBarOutline.src = "Sprites/HealthBarOutline.png"
+var HealthBar = new Image();
+HealthBar.src = "Sprites/HealthBar.png"
+var redFade = new Image();
+redFade.src = "Sprites/RedFade.png"
+var MissEFX = new Image();
+MissEFX.src = "Sprites/Miss.png"
 //SpriteSheet Image Variables-----------------------------------------------------------------
 var TitleButtonOn = new Image();
 TitleButtonOn.src = "SpriteSheets/ButtonOn.png"
@@ -51,11 +64,41 @@ var IntroLaser = new Image();
 IntroLaser.src = "SpriteSheets/LaserIntro.png"
 var PlayerAnimated = new Image();
 PlayerAnimated.src = "SpriteSheets/Player/PlayerIdle.png"
+//Monster SpriteSheets
+var CultistLeftImg = new Image();
+CultistLeftImg.src= "SpriteSheets/Monsters/Cultist/CultistLeft.png"
+var CultistRightImg = new Image();
+CultistRightImg.src= "SpriteSheets/Monsters/Cultist/CultistRight.png"
+var CultistAttackLeftImg = new Image();
+CultistAttackLeftImg.src= "SpriteSheets/Monsters/Cultist/CultistAttackLeft.png"
+var CultistAttackRightImg = new Image();
+CultistAttackRightImg.src= "SpriteSheets/Monsters/Cultist/CultistAttackRight.png"
+var CultistHurtRightImg = new Image();
+CultistHurtRightImg.src= "SpriteSheets/Monsters/Cultist/CultistHurtRight.png"
+var CultistHurtLeftImg = new Image();
+CultistHurtLeftImg.src= "SpriteSheets/Monsters/Cultist/CultistHurtLeft.png"
+var CultistDeathLeftImg = new Image();
+CultistDeathLeftImg.src= "SpriteSheets/Monsters/Cultist/CultistDeathLeft.png"
+var CultistDeathRightImg = new Image();
+CultistDeathRightImg.src= "SpriteSheets/Monsters/Cultist/CultistDeathRight.png"
+//Effect SpriteSheets
+var SwordSlash1 = new Image();
+SwordSlash1.src= "SpriteSheets/Player/PlayerAttack1.png"
+var SwordSlash2 = new Image();
+SwordSlash2.src= "SpriteSheets/Player/PlayerAttack2.png"
+var SwordSlash3 = new Image();
+SwordSlash3.src= "SpriteSheets/Player/PlayerAttack3.png"
 //Tile Sprites--------------------------------------------------------------------------------
 var WorldTileFade = new Image();
 WorldTileFade.src = "MapTileSprites/WorldTileFade.png"
+var WorldTileFade2 = new Image();
+WorldTileFade2.src = "MapTileSprites/WorldTileFade2.png"
 var WorldTile0 = new Image();
 WorldTile0.src = "MapTileSprites/WorldTile0.png"
+var WorldTile1 = new Image();
+WorldTile1.src = "MapTileSprites/WorldTile1.png"
+var WorldTile2 = new Image();
+WorldTile2.src = "MapTileSprites/WorldTile2.png"
 // Text Variables-----------------------------------------------------------------------------
 var TextOpen1 = new Image();
 TextOpen1.src = "Text/Opening/1.png"
@@ -73,6 +116,8 @@ var TextOpen7 = new Image();
 TextOpen7.src = "Text/Opening/7.png"
 var OpeningSkipButton = new Image();
 OpeningSkipButton.src = "Text/Opening/Skip.png"
+var deathScreenText = new Image();
+deathScreenText.src = "Text/OverWorld/DeadText.png"
 // Audio Variables---------------------------------------------------------------------------
 var IntroDoor = new Audio("Audio/DoorTitleSound.wav");
 var DoorAudInt = 0;
@@ -82,12 +127,27 @@ var IntroSong = document.getElementById('TitleSong')
 var TransitionSong = document.getElementById('TransitionSong')
 var NatureSounds = document.getElementById('NatureSound')
 var Area0Song = document.getElementById('Area0')
+var DeathSong = document.getElementById('deathsong')
 var LaserSoundEffect = new Audio("Audio/LaserSound.mp3");
+var DeathSoundEffect = new Audio("Audio/PlayerDeath.wav");
+var MonsterSFX1 = new Audio("Audio/MonsterSFX1.wav");
+var MonsterSFX2 = new Audio("Audio/MonsterSFX2.wav");
+var MonsterSFX3 = new Audio("Audio/MonsterSFX3.wav");
+var MonsterSFX4 = new Audio("Audio/MonsterSFX4.wav");
+var MonsterAttackSFX = new Audio("Audio/MonsterAttackSFX.wav");
+var MonsterAttackHitSFX = new Audio("Audio/MonsterAttackHitSFX.wav");
+var MonsterDeathSFX = new Audio("Audio/MonsterDeath.wav");
+var MonsterHurtSFX = new Audio("Audio/MonsterHurt.wav");
+var SwordSFX1 = new Audio("Audio/Sword1.wav");
+var SwordSFX2 = new Audio("Audio/Sword2.wav");
+var SwordSFX3 = new Audio("Audio/Sword3.wav");
 var CurrentSong = IntroSong;
 //Canvas Variables---------------------------------------------------------------------------
 var canvas;
 var canvasContext;
 var FrameRate = 60;
+var d = new Date();
+var CurrentTime;
 //Mouse pos calculation function-------------------------------------------------------------
 var MouseX;
 var MouseY;
@@ -114,6 +174,18 @@ function MouseCheck(ButX, SrcW, ButY, SrcH) {
 if (((MouseX <= ButX + SrcW) && (MouseX >= ButX)) && ((MouseY >= ButY) && (MouseY <= ButY + SrcH))) {
   mousecheck = true;
 } return mousecheck;
+}
+//Audio Playing function
+function playSong(newSong){
+    if (newSong != ""){
+        if(CurrentSong != "" ) {
+            CurrentSong.pause();
+        }
+        var newSongEl = newSong
+        newSongEl.currentTime = 0;
+        newSongEl.play();
+        CurrentSong = newSong;
+    }
 }
 // General starting function
 window.onload = function () {
@@ -170,9 +242,7 @@ function ButtonClick(){ if (MouseOverButton == true) {
   }, 10 + (100 * i))}
   // Beggining game Transition
   setTimeout(function(){
-CurrentSong.pause();
-CurrentSong = TransitionSong;
-CurrentSong.play();
+playSong(TransitionSong);
 //Skip Button creation
 var SkipButtonCheck = false;
 //Checking if mouse clicked
@@ -190,7 +260,7 @@ IntroEnd();
   }
 }, 10)
 // Checkign Mouse check for skip Button
-function MouseCheckSkip() { if (MouseCheck(50, 100, 600, 100) == false)
+function MouseCheckSkip() { if (MouseCheck(50, 100, 600, 70) == false)
 {return false} else {return true}
 }
 // Checking if mouse over button
@@ -204,70 +274,70 @@ OpeningSkipButton.src = "Text/Opening/Skip.png"
 for (i = 0; i < 40; i ++) { setTimeout( function(){
     if (SkipButtonCheck == false) {
 canvasContext.drawImage(TextOpen1,0,0,canvas.width, canvas.height);
-canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+canvasContext.drawImage(OpeningSkipButton,50,600,100,70);
 }
 },(100 * i))}
  // Second Transition
  for (i = 0; i < 40; i ++) { setTimeout( function(){
      if (SkipButtonCheck == false) {
 canvasContext.drawImage(TextOpen2,0,200,canvas.width, canvas.height);
- canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+canvasContext.drawImage(OpeningSkipButton,50,600,100,70);
  }
 }, 4000 + (100 * i))}
 // Fade
 for (i = 0; i < 40; i ++) { setTimeout( function(){
     if (SkipButtonCheck == false) {
   canvasContext.drawImage(Fade,0,0,canvas.width, canvas.height);
-  canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+canvasContext.drawImage(OpeningSkipButton,50,600,100,70);
 }
 }, 8000 + (100 * i))}
 // Third Transition Text
 for (i = 0; i < 40; i ++) { setTimeout( function(){
     if (SkipButtonCheck == false) {
   canvasContext.drawImage(TextOpen3,0,0,canvas.width, canvas.height);
-  canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+canvasContext.drawImage(OpeningSkipButton,50,600,100,70);
 }
 },12000 + (100 * i))}
 // Fourth Tranisition Text
 for (i = 0; i < 40; i ++) { setTimeout( function(){
     if (SkipButtonCheck == false) {
   canvasContext.drawImage(TextOpen4,0,200,canvas.width, canvas.height);
-  canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+canvasContext.drawImage(OpeningSkipButton,50,600,100,70);
 }
 },17000 + (100 * i))}
 // fade
 for (i = 0; i < 40; i ++) { setTimeout( function(){
     if (SkipButtonCheck == false) {
   canvasContext.drawImage(Fade,0,0,canvas.width, canvas.height);
-  canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+canvasContext.drawImage(OpeningSkipButton,50,600,100,70);
 }
 }, 22000 + (100 * i))}
 // Fifth Transition Text
 for (i = 0; i < 20; i ++) { setTimeout( function(){
     if (SkipButtonCheck == false) {
   canvasContext.drawImage(TextOpen5,0,0,canvas.width, canvas.height);
-  canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+canvasContext.drawImage(OpeningSkipButton,50,600,100,70);
 }
 },26000 + (100 * i))}
 // Sixth Transition Text
 for (i = 0; i < 40; i ++) { setTimeout( function(){
     if (SkipButtonCheck == false) {
   canvasContext.drawImage(TextOpen6,0,200,canvas.width, canvas.height);
-  canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+canvasContext.drawImage(OpeningSkipButton,50,600,100,70);
 }
 },28000 + (100 * i))}
 // fade
 for (i = 0; i < 40; i ++) { setTimeout( function(){
     if (SkipButtonCheck == false) {
   canvasContext.drawImage(Fade,0,0,canvas.width, canvas.height);
-  canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+canvasContext.drawImage(OpeningSkipButton,50,600,100,70);
 }
 }, 32000 + (100 * i))}
 // Seventh Transition Text
 for (i = 0; i < 40; i ++) { setTimeout( function(){
     if (SkipButtonCheck == false) {
   canvasContext.drawImage(TextOpen7,0,200,canvas.width, canvas.height);
-  canvasContext.drawImage(OpeningSkipButton,50,600,100,100);
+canvasContext.drawImage(OpeningSkipButton,50,600,100,70);
 }
 },36000 + (100 * i))}
 // End opening
@@ -280,7 +350,8 @@ if (SkipButtonCheck == false) {
   }, 3200);
 }})
   //Playing IntroSong
-  CurrentSong.play();
+  playSong(IntroSong);
+  setInterval(function(){CurrentTime = d.getTime(); d = new Date();}, 10);
 }
 //IntroEnding
 function IntroEnd(){
@@ -302,9 +373,12 @@ function IntroEnd(){
     },1000)
   }, 2000)
   // Drawing Opening Background of Game
-  for (i = 0; i < 40; i ++) { setTimeout( function(){
+  for (i = 0; i < 60; i ++) { setTimeout( function(){
     canvasContext.drawImage(WorldTileFade,0,0,canvas.width, canvas.height);
-  },3500 + (100 * i))}
+  },3500 + (50 * i))}
+  for (i = 0; i < 10; i ++) { setTimeout( function(){
+    canvasContext.drawImage(WorldTileFade2,0,0,canvas.width, canvas.height);
+  },6500 + (100 * i))}
   setTimeout( function(){
     ButtonAnimationIndex = 1;
     SourceWidth = 100;
@@ -326,14 +400,18 @@ function IntroEnd(){
   },7700 + (75 * i))}
   //playing area 0 Music
   setTimeout( function(){
-  CurrentSong = Area0Song;
-  CurrentSong.play();
+playSong(Area0Song);
   Worldx = 0;
   Worldy = 0;
   // Drawing everything loop
-  requestAnimationFrame(DrawEverything);
+    requestAnimationFrame(DrawEverything);
   // Setting movement  interval
+  if (Died === false) {
   MoveKeyLoop();
+}
+//Player Attacking
+canvas.addEventListener('click', PlayerAttack);
+setInterval(function ListenerRemove(){if (Alive == false) {canvas.removeEventListener('click', PlayerAttack); clearInterval(ListenerRemove);}}, 30);
 },10400)
 };
 // Game loop Function
@@ -342,7 +420,6 @@ function IntroEnd(){
 var Worldx = 0;
 var Worldy = 0;
 var UpOrDown = 0;
-var PlayerAnimationInt = 0;
 var PlayerDirection = 0;
 // Movement listeners------------------------------------
 var keyState = {};
@@ -354,9 +431,10 @@ window.addEventListener('keyup',function(e){
 },true);
 
 function MoveKeyLoop() {
+  if (StopAnimation == false) {
   // X-pos changes ----------
     if (keyState[65]){// Left (A)
-        Worldx += UpOrDown;
+        Worldx += UpOrDown
         PlayerDirection = 'A'
     }
     if (keyState[68]){// Right (D)
@@ -365,43 +443,652 @@ function MoveKeyLoop() {
     }
  // Y-pos changes ----------
    if (keyState[83]){// Down (S)
-     UpOrDown = 1
-     Worldy -= 2;
+     Worldy -= UpOrDown
      PlayerDirection = 'S'
    }
    if (keyState[87]){// Up (W)
-     UpOrDown = 1
-     Worldy += 2;
+     Worldy += UpOrDown
      PlayerDirection = 'W'
    }
+ }
+   //World Border
+   if (Worldy >= 1050) {
+     Worldy= 1049;
+   }
+   if (Worldy <= -1050) {
+     Worldy= -1049;
+   }
+   if (Worldx >= 1500) {
+     Worldx= 1499;
+   }
+   if (Worldx <= -1500) {
+     Worldx= -1499;
+   }
 //Checking for W or S key pressed, to Halve movement when moving diagonally, and checking for no movement
-   if (keyState[87] != true && keyState[83] != true) {
-     UpOrDown = 2;
-   } else if (keyState[87] != true && keyState[83] != true && keyState[68] != true && keyState[65] != true) {
+   if ((keyState[87] || keyState[83]) === true && (keyState[65] || keyState[68]) === true) {
+     UpOrDown = 1.5;
+   } else {UpOrDown = 2}
+  if (keyState[87] != true && keyState[83] != true && keyState[68] != true && keyState[65] != true) {
      PlayerDirection = 0
    }
   setTimeout(MoveKeyLoop, 10);
 }
 //-----------------------------------------------------
-//Character animation
-var PlayerX = 500 - (25/2)
+//Character animation and variables
+var PlayerX = (500 - (25/2))
 var PlayerY = 325
-var AnimationCountPlayer = 1
+var PlayerAnimationInt = 1;
+var PlayerAnimationIncrement = 1;
+var PlayerCountDoubler = 0;
+var PlayerCountDoublerCount = 8;
+var PlayerHealth = 0; // Death is 150.
+var PlayerAnimated2;
+var StopAnimation = false;
+//Player animation images
+var Ab = new Image();
+Ab.src = "SpriteSheets/Player/PlayerLeft.png"
+var Bb = new Image();
+Bb.src = "SpriteSheets/Player/PlayerRight.png"
+var Cb = new Image();
+Cb.src = "SpriteSheets/Player/PlayerDown.png"
+var Db = new Image();
+Db.src = "SpriteSheets/Player/PlayerUp.png"
+var Attacking = new Image();
+Attacking.src = "SpriteSheets/Player/PlayerBlur.png"
 function PlayerAnimate() {
-  if (PlayerAnimationInt > 10 || PlayerAnimationInt < 0) {
-AnimationCountPlayer = AnimationCountPlayer * -1
+  // Character Direction chnages
+  if (StopAnimation==false){
+  switch(PlayerDirection) {
+ // Left
+  case 'A':
+  PlayerAnimated2 = Ab
+   PlayerAnimationIncrement = 1
+  break;
+ // Right
+  case 'D':
+  PlayerAnimated2 = Bb
+   PlayerAnimationIncrement = 1
+  break;
+ // Down
+  case 'S':
+  PlayerAnimated2 = Cb
+   PlayerAnimationIncrement = 1
+  break;
+ //Up
+  case 'W':
+  PlayerAnimated2 = Db
+   PlayerAnimationIncrement = 1
+  break;
+ //Idle
+  default:
+  PlayerAnimated2 = PlayerAnimated
 }
-  PlayerAnimationInt += AnimationCountPlayer;
-canvasContext.drawImage(PlayerAnimated,(PlayerAnimationInt * 25),0,25,50,PlayerX,PlayerY,25,50)
+}
+if(Hit == true){
+  PlayerAnimated2=Attacking;
+}
+if (PlayerDirection != 0) {PlayerCountDoublerCount = 4;} else {PlayerCountDoublerCount = 16;}
+//Animating
+if(StopAnimation==true || Hit == true){
+  PlayerCountDoublerCount = 2;
+}
+  if (PlayerCountDoubler >= PlayerCountDoublerCount) {
+    PlayerCountDoubler = 0;
+  }
+    PlayerCountDoubler ++
+if (((PlayerAnimationInt === 9 || PlayerAnimationInt === 0) && PlayerCountDoubler === 1) && PlayerDirection === 0) {
+  PlayerAnimationIncrement = PlayerAnimationIncrement * -1
+}
+if (((PlayerAnimationInt === 9 || PlayerAnimationInt === 0) && PlayerCountDoubler === 1) && PlayerDirection != 0) {
+  PlayerAnimationInt = 0;
+}
+if (PlayerCountDoubler === 1) {
+PlayerAnimationInt += PlayerAnimationIncrement
+}
+  if (Alive = true) {
+canvasContext.drawImage(PlayerAnimated2,(PlayerAnimationInt * 25),0,25,50,PlayerX,PlayerY,25,50)
+}
 }
 //Sprite Drawing
-function DrawEverything () {
-    requestAnimationFrame(DrawEverythingBackground);
-    requestAnimationFrame(PlayerAnimate);
-    requestAnimationFrame(DrawEverything);
+function DrawEverythingFunction () {
+  if (Alive = true) {
+  if (PlayerHealth >= 150) {
+    DrawEverything = function () {};
+    PlayerDeath();
+  }
+  requestAnimationFrame(DrawEverythingBackground);
+   requestAnimationFrame(PlayerAnimate);
+    requestAnimationFrame(SpawnMonsters);
+     requestAnimationFrame(DrawMonster);
+      requestAnimationFrame(DrawEverythingUI);
+       requestAnimationFrame(DrawMonsterEFX);
+        requestAnimationFrame(DrawEverything);
+    }
 }
+DrawEverything = DrawEverythingFunction;
 // Background Drawing
 function DrawEverythingBackground () {
       canvasContext.drawImage(WorldTile0,Worldx,Worldy,canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile1,(Worldx+1000),(Worldy),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile1,(Worldx),(Worldy+700),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile1,(Worldx-1000),(Worldy),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile1,(Worldx),(Worldy-700),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile1,(Worldx+1000),(Worldy+700),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile1,(Worldx-1000),(Worldy-700),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile1,(Worldx+1000),(Worldy-700),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile1,(Worldx-1000),(Worldy+700),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile2,(Worldx+2000),(Worldy),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile2,(Worldx),(Worldy+1400),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile2,(Worldx-2000),(Worldy),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile2,(Worldx),(Worldy-1400),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile2,(Worldx+2000),(Worldy+1400),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile2,(Worldx-2000),(Worldy-1400),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile2,(Worldx+2000),(Worldy-1400),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile2,(Worldx-2000),(Worldy+1400),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile2,(Worldx+2000),(Worldy+700),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile2,(Worldx-2000),(Worldy-700),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile2,(Worldx+2000),(Worldy-700),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile2,(Worldx-2000),(Worldy+700),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile2,(Worldx+1000),(Worldy+1400),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile2,(Worldx-1000),(Worldy-1400),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile2,(Worldx+1000),(Worldy-1400),canvas.width, canvas.height);
+    canvasContext.drawImage(WorldTile2,(Worldx-1000),(Worldy+1400),canvas.width, canvas.height);
+}
+//UI Drawing
+function DrawEverythingUI () {
+canvasContext.drawImage(HealthBar,PlayerHealth,0,154,29,44,20,166,29);
+canvasContext.drawImage(HealthBarOutline,10,20,200,29);
+}
+//Player Death
+var Alive = true;
+var Died = false;
+function PlayerDeath() {
+var PlayerDeadBlinkFix = lov;
+function lov() {
+    canvasContext.drawImage(PlayerDead,475,(350-12.5),50,25);
+    requestAnimationFrame(PlayerDeadBlinkFix);
+  }
+  requestAnimationFrame(PlayerDeadBlinkFix);
+setTimeout( function(){
+        requestAnimationFrame(DrawEverythingBackground);
+        requestAnimationFrame(DrawEverythingUI);
+      },0)
+  Alive = false;
+  Died = true;
+  NatureSounds.pause();
+  DeathSoundEffect.play();
+playSong(DeathSong);
+  for (i = 0; i < 25; i ++) { setTimeout( function(){
+    canvasContext.drawImage(redFade,0,0,canvas.width, canvas.height);
+  },150 * i)}
+  for (i = 0; i < 20; i ++) { setTimeout( function(){
+    canvasContext.drawImage(deathScreenText,385,50,256,256);
+     canvasContext.drawImage(deathScreenButton,400,600,200,48);
+  }, 3750 + (150 * i))}
+
+// Death Button drawing
+setTimeout( function(){
+  var DeathButtonCheck = setInterval(function(){
+         canvasContext.drawImage(deathScreenButton,400,600,200,48);
+    if (MouseCheck(400,200,600,48)) {
+      deathScreenButton.src = 'Sprites/DeathButtonYellow.png'
+    } else {
+          deathScreenButton.src = 'Sprites/DeathButton.png'
+    }
+  }, 10)
+  canvas.addEventListener('click', function deathButton(){
+    if (MouseCheck(400,200,600,48)) {
+      clearInterval(DeathButtonCheck);
+      PlayerDeadBlinkFix = 0;
+      Worldx = 0;
+      Worldy = 0;
+      PlayerHealth = 0;
+      DrawEverything = DrawEverythingFunction;
+      canvas.removeEventListener('click', deathButton);
+      deathScreenButton.src = 'Sprites/DeathButton.png'
+        Alive = true;
+      IntroEnd();
+    }
+  })
+}, 6750)
+}
+//Monster Spawning Calculations
+function SpawnMonsters() {
+  //PlayerAnimation Extension Checking
+  if(CurrentTime-TimedHit > 300){
+    Hit=false;
+  }
+if ((Math.floor(Math.random() * 90) == 5)) {SpawnCultist();}
+}
+//Monster & Effect drawing calculation
+var MonsterAnimations = [];
+var AttackEFXAnimations = [];
+//Monster 'Spawning'
+function SpawnCultist() {
+  var MonsterX = Math.floor(Math.random() * 500)+1500;
+  var MonsterY = Math.floor(Math.random() * 400)+1000;
+if (Math.floor(Math.random() * 2) == 1) {
+  MonsterX = Math.floor(Math.random() * -500)-1500;
+  MonsterY = Math.floor(Math.random() * -400)-1000;
+}
+  var MonsterDead = false;
+  var BeingAttacked = false;
+  var MonsterHealth = 100;
+  var MonsterDeathCount = 0;
+  var MonsterAnimationInt = 0;
+  var MonsterAnimationIntExtender = 0;
+  var posX = MonsterX + Worldx;
+  var posY = MonsterY + Worldy;
+  var AnimationType = 1;
+  var Attacking = false;
+  var Playerx = PlayerX - 25;
+  var Playery = PlayerY - 25;
+  var MonsterSpeedX =(Math.random() * 1)+0.9;
+  var MonsterSpeedY =(Math.random() * 1)+0.9;
+      requestAnimationFrame(DrawCalc);
+  // Monster Hit Detection
+  function PlayerCheck(){
+      BeingAttacked=true;
+      Attacking = false;
+      MonsterAnimationInt=1;
+      MonsterHealth-=40;
+      var Hurt = MonsterHurtSFX.cloneNode();
+      Hurt.play();
+      var AudioChoice = Math.floor(Math.random()*3);
+      if(AudioChoice==0){
+        var Sound=SwordSFX1.cloneNode();
+        Sound.play();
+      } else if(AudioChoice==1){
+        var Sound=SwordSFX2.cloneNode();
+        Sound.play();
+      } else if(AudioChoice==2){
+        var Sound=SwordSFX3.cloneNode();
+        Sound.play();
+      }
+      StaggerTime = CurrentTime;
+      PushEFX();
+}
+  //Drawing EFX
+  function PushEFX(){
+    var MonsterEFXInt = 0;
+    var AnimationTypeInt = Math.floor(Math.random()*3);
+    var LoopCheck = false;
+    var MonsterAnimationIntExtender1=0;
+    var ValuesEFX = {
+      X: posX,
+      Y: posY,
+      A: AnimationTypeInt,
+      N: MonsterEFXInt
+    }
+    AttackEFXAnimations.push(ValuesEFX);
+    var ArrayPosEFX = AttackEFXAnimations.length-1;
+    AttackEFXAnimations[ArrayPosEFX] = ValuesEFX;
+    requestAnimationFrame(EFXAnimationLoop);
+    function EFXAnimationLoop() {
+      if (MonsterEFXInt >= 5) {
+        LoopCheck=true;
+      }
+      if (MonsterAnimationIntExtender1 == 4) {
+          MonsterEFXInt++;
+        }
+        if (MonsterAnimationIntExtender1 >= 4) {
+          MonsterAnimationIntExtender1=0;
+        }
+        MonsterAnimationIntExtender1++;
+        if(LoopCheck==false){
+          ValuesEFX = {
+            X: posX,
+            Y: posY,
+            A: AnimationTypeInt,
+            N: MonsterEFXInt
+          }
+          AttackEFXAnimations[ArrayPosEFX] = ValuesEFX;
+          requestAnimationFrame(EFXAnimationLoop);
+        } else if (LoopCheck==true) {AttackEFXAnimations[ArrayPosEFX] = 0; return;}
+    }
+  }
+  var DeathType = 0;
+  function DetectMonster() {
+    //Implement Click Death
+    if(MonsterHealth<=0){
+      canvas.removeEventListener('click', DetectMonster);
+      return;
+    }
+    if (MouseCheck(posX, 75, posY, 75)) {
+  //Checking for player nearby
+  var TimeStamp = CurrentTime;
+  var AttackedCheck=false;
+      setInterval(function PlayerChecking(){
+        if(CurrentTime-TimeStamp<600 && AttackedCheck==false) {
+          if ((MonsterX + Worldx < Playerx + 1 && MonsterX + Worldx > Playerx -60)&&(MonsterY + Worldy < Playery + 60 && MonsterY + Worldy > Playery -60)) {
+            AttackedCheck=true;
+            clearInterval(PlayerChecking);
+            AnimationType=6;
+            PlayerCheck();
+            DeathType = 0;
+          } else if ((MonsterX + Worldx < Playerx + 60 && MonsterX + Worldx > Playerx -1 )&&(MonsterY + Worldy < Playery + 60 && MonsterY + Worldy > Playery -60)) {
+            AttackedCheck=true;
+            clearInterval(PlayerChecking);
+            AnimationType=5;
+            PlayerCheck();
+            DeathType = 1;
+          }
+        }
+      }, 10);
+    }
+  };
+  // Monster Drawing
+  var Values = {
+    X: posX,
+    Y: posY,
+    A: AnimationType,
+    N: MonsterAnimationInt
+  }
+  MonsterAnimations.push(Values);
+  var ArrayPos = MonsterAnimations.length-1;
+  canvas.addEventListener('click', DetectMonster);
+  var StaggerTime = 0;
+function DrawCalc () {
+  if (MonsterDead === false && Alive == true) {
+    //Audio playing
+    if (MonsterX + Worldx > Playerx -1000 && MonsterX + Worldx < Playerx + 1000 && MonsterY + Worldy > Playery -700 && MonsterY + Worldy < Playery + 700) {
+      var Play = Math.floor(Math.random()*1000);
+      if(Play==50){
+        var choice = Math.floor(Math.random()*5);
+        if(choice==1){
+          var Atck = MonsterSFX1.cloneNode();
+          Atck.play();
+        } else if (choice==2){
+          var Atck = MonsterSFX2.cloneNode();
+          Atck.play();
+        }else if (choice==3){
+          var Atck = MonsterSFX3.cloneNode();
+          Atck.play();
+        }else if (choice==4){
+          var Atck = MonsterSFX4.cloneNode();
+          Atck.play();
+        }
+      }
+    }
+    // Checking if monster can hurt player
+    if(BeingAttacked == false){
+    var MonsterAttack;
+    var MonsterHitAttack;
+    if ((MonsterX + Worldx < Playerx + 1 && MonsterX + Worldx > Playerx -30)&&(MonsterY + Worldy < Playery + 50 && MonsterY + Worldy > Playery -30)) {
+      AnimationType = 4;
+      if (Attacking == false) {
+        MonsterAttack = MonsterAttackSFX.cloneNode();
+        MonsterAttack.play();
+        MonsterAnimationInt=0;
+        Attacking = true;
+      }
+      if (MonsterAnimationInt == 5) {
+        PlayerHealth+=5;
+        MonsterHitAttack = MonsterAttackHitSFX.cloneNode();
+        MonsterHitAttack.play();
+      }
+    } else if ((MonsterX + Worldx < Playerx + 30 && MonsterX + Worldx > Playerx -1 )&&(MonsterY + Worldy < Playery + 50 && MonsterY + Worldy > Playery -30)) {
+      AnimationType = 3;
+      if (Attacking == false) {
+        MonsterAttack = MonsterAttackSFX.cloneNode();
+        MonsterAttack.play();
+        MonsterAnimationInt=0;
+        Attacking = true;
+      }
+      if (MonsterAnimationInt == 5) {
+        PlayerHealth+=5;
+        MonsterHitAttack = MonsterAttackHitSFX.cloneNode();
+        MonsterHitAttack.play();
+      }
+    } else if (MonsterX + Worldx > Playerx + 2 && Attacking == false) {
+      MonsterX-=MonsterSpeedX;
+      AnimationType = 2;
+    } else if (MonsterX + Worldx < Playerx - 2 && Attacking == false) {
+      MonsterX+=MonsterSpeedX;
+      AnimationType = 1;
+    }
+    if (MonsterY + Worldy > Playery && Attacking == false) {
+      MonsterY-=MonsterSpeedY;
+      if (MonsterX + Worldx > Playerx - 2 && Attacking == false) {
+        AnimationType = 2;
+      }
+    } else if (MonsterY + Worldy < Playery && Attacking == false) {
+      MonsterY+=MonsterSpeedY;
+      if (MonsterX + Worldx < Playerx + 2 && Attacking == false) {
+        AnimationType = 1;
+      }
+    }
+    posX = MonsterX + Worldx;
+    posY = MonsterY + Worldy;
+    if (MonsterAnimationInt >= 5) {
+      MonsterAnimationInt=0;
+      Attacking = false;
+    }
+    if (MonsterAnimationIntExtender == 4) {
+        MonsterAnimationInt++;
+      }
+      if (MonsterAnimationIntExtender >= 4) {
+        MonsterAnimationIntExtender=0;
+      }
+      MonsterAnimationIntExtender++;
+  } else if(BeingAttacked==true){
+   posX = MonsterX + Worldx;
+   posY = MonsterY + Worldy;
+   if(CurrentTime-StaggerTime > 600) {
+     BeingAttacked=false;
+   }
+  }
+  if(MonsterHealth<= 0){
+    if(MonsterDeathCount==0){
+      MonsterDeathCount=1;
+      MonsterAnimationInt=0;
+      var Death = MonsterDeathSFX.cloneNode();
+      Death.play();
+    }
+    BeingAttacked=true;
+    if(DeathType=0){
+      AnimationType=7;
+    } else {AnimationType=8;}
+  //Animation ints
+    if (MonsterAnimationInt >= 6) {
+      MonsterDeathCount=2;
+      MonsterAnimationInt=5
+      setTimeout(function(){MonsterDead = true;}, 500);
+    }
+    if (MonsterAnimationIntExtender == 4 && MonsterDeathCount == 1) {
+        MonsterAnimationInt++;
+      }
+      if (MonsterAnimationIntExtender >= 4 && MonsterDeathCount == 1) {
+        MonsterAnimationIntExtender=0;
+      }
+      MonsterAnimationIntExtender++;
+  }
+    var Values = {
+      X: posX,
+      Y: posY,
+      A: AnimationType,
+      N: MonsterAnimationInt
+    }
+    MonsterAnimations[ArrayPos] = Values;
+
+    requestAnimationFrame(DrawCalc);
+  } else {MonsterAnimations[ArrayPos] = 0;}
+}
+}
+//Drawing monsters
+  function DrawMonster() {
+for (i = 0; i < MonsterAnimations.length; i++) {
+  if (MonsterAnimations[i] != 0) {
+if (MonsterAnimations[i].A == 1) {
+  canvasContext.drawImage(CultistLeftImg,(MonsterAnimations[i].N*50),0,50,50,MonsterAnimations[i].X,MonsterAnimations[i].Y,75,75);
+}
+if (MonsterAnimations[i].A == 2) {
+  canvasContext.drawImage(CultistRightImg,(MonsterAnimations[i].N*50),0,50,50,MonsterAnimations[i].X,MonsterAnimations[i].Y,75,75);
+}
+if (MonsterAnimations[i].A == 3) {
+  canvasContext.drawImage(CultistAttackLeftImg,(MonsterAnimations[i].N*50),0,50,50,MonsterAnimations[i].X,MonsterAnimations[i].Y,75,75);
+}
+if (MonsterAnimations[i].A == 4) {
+  canvasContext.drawImage(CultistAttackRightImg,(MonsterAnimations[i].N*50),0,50,50,MonsterAnimations[i].X,MonsterAnimations[i].Y,75,75);
+}
+if (MonsterAnimations[i].A == 5) {
+  canvasContext.drawImage(CultistHurtLeftImg,MonsterAnimations[i].X,MonsterAnimations[i].Y,75,75);
+}
+if (MonsterAnimations[i].A == 6) {
+  canvasContext.drawImage(CultistHurtRightImg,MonsterAnimations[i].X,MonsterAnimations[i].Y,75,75);
+}
+if (MonsterAnimations[i].A == 7) {
+  canvasContext.drawImage(CultistDeathLeftImg,(MonsterAnimations[i].N*50),0,50,50,MonsterAnimations[i].X,MonsterAnimations[i].Y,75,75);
+}
+if (MonsterAnimations[i].A == 8) {
+  canvasContext.drawImage(CultistDeathRightImg,(MonsterAnimations[i].N*50),0,50,50,MonsterAnimations[i].X,MonsterAnimations[i].Y,75,75);
+}
+  }
+ }}
+//DrawingMonsterEFX
+ function DrawMonsterEFX() {
+var Total0 = 0;
+for (i = 0; i < AttackEFXAnimations.length; i++) {
+ if (AttackEFXAnimations[i] != 0) {
+if (AttackEFXAnimations[i].A == 0) {
+  canvasContext.drawImage(SwordSlash1,(AttackEFXAnimations[i].N*120),0,120,120,AttackEFXAnimations[i].X-22.5,AttackEFXAnimations[i].Y-22.5,120,120);
+}
+if (AttackEFXAnimations[i].A == 1) {
+  canvasContext.drawImage(SwordSlash2,(AttackEFXAnimations[i].N*120),0,120,120,AttackEFXAnimations[i].X-22.5,AttackEFXAnimations[i].Y-22.5,120,120);
+}
+if (AttackEFXAnimations[i].A == 2) {
+  canvasContext.drawImage(SwordSlash3,(AttackEFXAnimations[i].N*120),0,120,120,AttackEFXAnimations[i].X-22.5,AttackEFXAnimations[i].Y-22.5,120,120);
+}
+if (AttackEFXAnimations[i].A == 3) {
+  canvasContext.drawImage(MissEFX,PlayerX-25,PlayerY-15,35,21);
+}
+} else {Total0++;}}
+if(Total0 >= AttackEFXAnimations.length && check_for_equal_array_elements(AttackEFXAnimations) == true) {
+  AttackEFXAnimations = [];
+}
+}
+//PlayerAttack
+var Missed = false;
+var Hit = false;
+var TimedHit = CurrentTime;
+ function PlayerAttack(){
+   var AttckCheck = 0;
+   var ClickX = MouseX;
+   var ClickY = MouseY;
+   var ClickMonsterX = 0;
+   var ClickMonsterY = 0;
+   for (i = 0; i < MonsterAnimations.length; i++) {
+     if (MonsterAnimations[i] != 0) {
+       if (MouseCheck(MonsterAnimations[i].X, 75, MonsterAnimations[i].Y, 75)) {
+         AttckCheck=1;
+         ClickMonsterX = MonsterAnimations[i].X;
+         ClickMonsterY = MonsterAnimations[i].Y;
+         break;
+       }
+     }
+    }
+  if (AttckCheck==0 && Missed == false) {
+    Missed=true;
+    PlayerMiss(ClickX, ClickY, 0);
+  }
+  if (AttckCheck==1) {
+    Hit = true;
+    TimedHit=CurrentTime;
+    PlayerHit(ClickMonsterX, ClickMonsterY, 1);
+  }
+ }
+//Player Miss
+function PlayerMiss(x, y) {
+  PlayerMove(x, y, 0);
+}
+//Plauer Hit
+function PlayerHit(x, y) {
+  PlayerMove(x, y, 1);
+}
+//Player moving
+function PlayerMove(Xx, Yy, HitorMiss) {
+  Xx = Xx-500;
+  Yy = Yy-350;
+  var x;
+  var y;
+
+if(HitorMiss==0){
+  x = (Worldx+12.5)-Xx;
+  y = (Worldy+12.5)-Yy;
+}
+if(HitorMiss==1){
+  x = (Worldx+((Math.random()*50)-25)-37.5)-Xx;
+  y = (Worldy+((Math.random()*50)-25)-37.5)-Yy;
+}
+  if (y >= 1050 || y <= -1050 || x >= 1500 || x <= -1500) {
+    Missed=false; StopAnimation=false;
+    return;
+}
+  StopAnimation = true;
+  PlayerAnimated2 = Attacking;
+    XDif = 10;
+    YDif = 10;
+  var check=false;
+  requestAnimationFrame(Move);
+  if (HitorMiss==1){
+  canvas.addEventListener('click', function(){
+    check=true;
+
+  });
+}
+  function Move() {
+    if(check == false) {
+  if (Worldx>x) {
+    Worldx-=XDif;
+  }
+  if (Worldx<x) {
+    Worldx+=XDif;
+  }
+  if (Worldy>y) {
+    Worldy-=YDif;
+  }
+  if (Worldy<y) {
+    Worldy+=YDif;
+  }
+
+  if (Worldy>y-10 && Worldy<y +10) {
+    Worldy=y;
+  }
+  if (Worldx>x-10 && Worldx<x +10) {
+    Worldx=x;
+  }
+
+  if (Worldx == x && Worldy == y) {
+    check=true;
+    if(HitorMiss==0){
+      var ValuesEFX = {
+        X: 1,
+        Y: 1,
+        A: 3,
+        N: 1
+      }
+      AttackEFXAnimations.push(ValuesEFX);
+      var ArrayPosEFX = AttackEFXAnimations.length-1;
+      setTimeout(function(){Missed=false; StopAnimation=false; AttackEFXAnimations[ArrayPosEFX]=0;}, 300)
+    }
+    if(HitorMiss==1){
+       StopAnimation=false;
+    }
+    }
+    requestAnimationFrame(Move);
+    }
+}
+}
+//Array diminishing
+function check_for_equal_array_elements(my_array){
+  if (my_array.length == 1 || my_array.length == 0) {
+     return true;
+  }
+  for (i=0;i<my_array.length;i++){
+     if (i > 0 && my_array[i] != my_array[i-1]) {
+       return false;
+     }
+  }
+  return true;
 }
 </script>
