@@ -1,2 +1,2 @@
 # Unfinished-Game---Overworld
-A top down rpg.
+A wave based enemy destroyer type game
